@@ -1,3 +1,56 @@
+## 🧩 Integración Low-Code (Frontend y Backend)
+
+### Frontend: Formularios Low-Code con FormKit
+
+Se implementó un formulario de autenticación low-code en el componente `AuthForm.vue` usando la librería [FormKit](https://formkit.com/). Ahora los formularios de login y registro se generan de manera declarativa, permitiendo modificar los campos fácilmente desde el template, sin lógica manual para cada input.
+
+- **Ventajas:**
+  - Menos código repetitivo para formularios.
+  - Validaciones y estilos centralizados.
+  - Fácil de extender o modificar campos.
+- **Ubicación:** `apps/web/src/components/AuthForm.vue`
+- **Cómo funciona:**
+  - Cada campo del formulario se define como un componente `<FormKit />` con sus props (tipo, validación, placeholder, etc).
+  - El formulario completo se maneja con un objeto reactivo (`loginForm` o `registerForm`).
+  - Al enviar, los datos se pasan automáticamente a la función de autenticación.
+
+### Backend: Motor de Reglas Low-Code con json-rules-engine
+
+Se integró la librería [json-rules-engine](https://github.com/CacheControl/json-rules-engine) en el backend para permitir lógica de negocio configurable mediante reglas JSON. Esto habilita que ciertas validaciones, alertas o flujos puedan ser definidos sin modificar el código fuente, solo cambiando las reglas.
+
+- **Ventajas:**
+  - Permite lógica condicional dinámica y personalizable.
+  - Facilita la adaptación de reglas de negocio sin redeploy.
+  - Útil para validaciones, promociones, alertas, etc.
+- **Ubicación:** `backend/src/controllers/productsController.ts` (ejemplo de integración en endpoint existente)
+- **Cómo funciona:**
+  - Se define un conjunto de reglas en formato JSON.
+  - El endpoint procesa los datos recibidos y ejecuta las reglas usando `json-rules-engine`.
+  - El resultado de las reglas puede modificar la respuesta, lanzar alertas, o condicionar el flujo.
+
+#### Ejemplo de uso en backend
+
+```ts
+import { Engine } from 'json-rules-engine'
+
+const rules = [
+  {
+    conditions: {
+      all: [{ fact: 'stock', operator: 'lessThan', value: 10 }],
+    },
+    event: { type: 'lowStock', params: { message: 'Stock bajo' } },
+  },
+]
+
+const engine = new Engine(rules)
+const facts = { stock: 5 }
+engine.run(facts).then(({ events }) => {
+  // Si stock < 10, se dispara el evento 'lowStock'
+})
+```
+
+---
+
 # 🍱 EcoSave Market - Plataforma Anti-Desperdicio de Alimentos
 
 [![Vue.js](https://img.shields.io/badge/Vue.js-3.5.18-4FC08D?style=flat&logo=vue.js&logoColor=white)](https://vuejs.org/)
