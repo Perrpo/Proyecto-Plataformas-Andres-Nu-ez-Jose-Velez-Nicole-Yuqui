@@ -9,42 +9,40 @@
           <Transition name="fade-slide" mode="out-in">
             <div v-if="tab === 'login'" key="left-login">
               <h2 class="right-title">Sign In</h2>
-              <form @submit.prevent="handleSubmit" class="form">
+              <FormKit
+                type="form"
+                :actions="false"
+                :submit-label="isLoading ? 'Procesando...' : 'SIGN IN'"
+                @submit="onFormKitLoginSubmit"
+                :disabled="isLoading"
+                v-model="loginForm"
+              >
                 <div class="input-row">
                   <span class="icon">@</span>
-                  <input
+                  <FormKit
                     type="email"
-                    id="email-left"
-                    v-model="email"
+                    name="email"
+                    label="Email"
                     placeholder="Email"
-                    required
+                    validation="required|email"
+                    input-class="formkit-input"
+                    v-model="loginForm.email"
                   />
                 </div>
                 <div class="input-row">
                   <span class="icon">🔒</span>
-                  <input
-                    :type="showPassword ? 'text' : 'password'"
-                    id="password-left"
-                    v-model="password"
+                  <FormKit
+                    type="password"
+                    name="password"
+                    label="Password"
                     placeholder="Password"
-                    required
-                    autocomplete="current-password"
+                    validation="required"
+                    input-class="formkit-input"
+                    v-model="loginForm.password"
                   />
-                  <button
-                    type="button"
-                    class="reveal-btn"
-                    :aria-pressed="showPassword ? 'true' : 'false'"
-                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                    @click="showPassword = !showPassword"
-                  >
-                    {{ showPassword ? '🙈' : '👁️' }}
-                  </button>
                 </div>
                 <div v-if="error" class="error-message">{{ error }}</div>
-                <button class="submit-btn" type="submit" :disabled="isLoading">
-                  {{ isLoading ? 'Procesando...' : 'SIGN IN' }}
-                </button>
-              </form>
+              </FormKit>
               <div class="switch-row">
                 <button class="ghost" @click="tab = 'register'">Create account</button>
               </div>
@@ -63,60 +61,63 @@
             <div v-if="tab === 'register'" key="right-register">
               <h2 class="right-title">Create Account</h2>
               <p class="right-helper">or use your email for registration:</p>
-              <form @submit.prevent="handleSubmit" class="form">
+              <FormKit
+                type="form"
+                :actions="false"
+                :submit-label="isLoading ? 'Procesando...' : 'SIGN UP'"
+                @submit="onFormKitRegisterSubmit"
+                :disabled="isLoading"
+                v-model="registerForm"
+              >
                 <div class="input-row">
                   <span class="icon">👤</span>
-                  <input
+                  <FormKit
                     type="text"
-                    id="username-right"
-                    v-model="username"
+                    name="username"
+                    label="Name"
                     placeholder="Name"
-                    required
+                    validation="required"
+                    input-class="formkit-input"
+                    v-model="registerForm.username"
                   />
                 </div>
                 <div class="input-row">
                   <span class="icon">🏢</span>
-                  <input
+                  <FormKit
                     type="text"
-                    id="business-right"
-                    v-model="business"
+                    name="business"
+                    label="Business"
                     placeholder="Business (optional)"
+                    input-class="formkit-input"
+                    v-model="registerForm.business"
                   />
                 </div>
                 <div class="input-row">
                   <span class="icon">@</span>
-                  <input
+                  <FormKit
                     type="email"
-                    id="email-right"
-                    v-model="email"
+                    name="email"
+                    label="Email"
                     placeholder="Email"
-                    required
+                    validation="required|email"
+                    input-class="formkit-input"
+                    v-model="registerForm.email"
                   />
                 </div>
                 <div class="input-row">
                   <span class="icon">🔒</span>
-                  <input
-                    :type="showPassword ? 'text' : 'password'"
-                    id="password-right"
-                    v-model="password"
+                  <FormKit
+                    type="password"
+                    name="password"
+                    label="Password"
                     placeholder="Password"
-                    required
+                    validation="required"
+                    input-class="formkit-input"
+                    v-model="registerForm.password"
                   />
-                  <button
-                    type="button"
-                    class="reveal-btn"
-                    :aria-pressed="showPassword ? 'true' : 'false'"
-                    :aria-label="showPassword ? 'Hide password' : 'Show password'"
-                    @click="showPassword = !showPassword"
-                  >
-                    {{ showPassword ? '🙈' : '👁️' }}
-                  </button>
                 </div>
                 <div v-if="error" class="error-message">{{ error }}</div>
-                <button class="submit-btn" type="submit" :disabled="isLoading">
-                  {{ isLoading ? 'Procesando...' : 'SIGN UP' }}
-                </button>
-              </form>
+              </FormKit>
               <div class="switch-row">
                 <button class="ghost" @click="tab = 'login'">I already have an account</button>
               </div>
@@ -134,59 +135,34 @@
   </div>
 </template>
 
+
 <script setup lang="ts">
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
+import { FormKit } from '@formkit/vue'
 
 const tab = ref<'login' | 'register'>('login')
-const username = ref('')
-const email = ref('')
-const password = ref('')
-const business = ref('')
-const showPassword = ref(false)
 const isLoading = ref(false)
 const error = ref('')
 const router = useRouter()
 const auth = useAuthStore()
 
-async function handleSubmit() {
-  if (!email.value || !password.value) {
-    error.value = 'Email y contraseña son requeridos'
-    return
-  }
+// Los schemas ya no son necesarios, los campos se definen directamente en el template
 
-  if (tab.value === 'register' && !username.value) {
-    error.value = 'Nombre es requerido para registrarse'
-    return
-  }
 
-  isLoading.value = true
+const loginForm = ref({ email: '', password: '' })
+const registerForm = ref({ username: '', business: '', email: '', password: '' })
+
+async function onFormKitLoginSubmit(data: any) {
   error.value = ''
-
+  isLoading.value = true
   try {
-    let result
-    if (tab.value === 'login') {
-      result = await auth.login(email.value, password.value)
-      if (result.success) {
-        router.push('/dashboard')
-      } else {
-        error.value = result.error || 'Error desconocido'
-      }
+    const result = await auth.login(data.email, data.password)
+    if (result.success) {
+      router.push('/dashboard')
     } else {
-      result = await auth.register(email.value, password.value, username.value, business.value)
-      if (result.success) {
-        // Mostrar mensaje de éxito y cambiar a Sign In
-        error.value = '¡Registro exitoso! Ahora puedes iniciar sesión.'
-        tab.value = 'login'
-        // Limpiar formulario
-        username.value = ''
-        business.value = ''
-        email.value = ''
-        password.value = ''
-      } else {
-        error.value = result.error || 'Error desconocido'
-      }
+      error.value = result.error || 'Error desconocido'
     }
   } catch {
     error.value = 'Error de conexión'
@@ -194,6 +170,27 @@ async function handleSubmit() {
     isLoading.value = false
   }
 }
+
+async function onFormKitRegisterSubmit(data: any) {
+  error.value = ''
+  isLoading.value = true
+  try {
+    const result = await auth.register(data.email, data.password, data.username, data.business)
+    if (result.success) {
+      error.value = '¡Registro exitoso! Ahora puedes iniciar sesión.'
+      tab.value = 'login'
+      registerForm.value = { username: '', business: '', email: '', password: '' }
+    } else {
+      error.value = result.error || 'Error desconocido'
+    }
+  } catch {
+    error.value = 'Error de conexión'
+  } finally {
+    isLoading.value = false
+  }
+}
+// ...fin del script setup
+// ...fin del script setup
 </script>
 
 <style scoped>

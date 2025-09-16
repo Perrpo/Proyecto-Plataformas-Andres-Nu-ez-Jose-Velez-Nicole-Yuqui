@@ -14,5 +14,8 @@
     "type-check": "npm -w @repo/web run type-check",
     "lint": "npm -w @repo/web run lint && npm -w @repo/backend run lint",
     "start": "npm -w @repo/backend run start"
+  },
+  "dependencies": {
+    "json-rules-engine": "^7.3.1"
   }
 }
