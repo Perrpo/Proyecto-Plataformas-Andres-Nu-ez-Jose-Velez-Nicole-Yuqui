@@ -1,0 +1,75 @@
+@import './base.css';
+
+#app {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
+  background: var(--grad-primary);
+}
+
+a,
+.green {
+  text-decoration: none;
+  color: var(--neon-cyan);
+  transition:
+    color 160ms ease,
+    background 160ms ease;
+  padding: 3px;
+}
+
+@media (hover: hover) {
+  a:hover {
+    background: linear-gradient(90deg, rgba(33, 230, 255, 0.12), rgba(155, 92, 255, 0.12));
+    color: var(--neon-magenta);
+  }
+}
+
+/* Elimina el grid y flex para pantallas grandes */
+body {
+  display: block;
+  place-items: unset;
+}
+
+@media (min-width: 1024px) {
+  #app {
+    display: block;
+    padding: 0;
+  }
+}
+
+.layout {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+}
+.main-content {
+  margin-left: 220px;
+  padding: 2rem;
+  width: 100%;
+  min-height: 100vh;
+  background:
+    linear-gradient(180deg, rgba(19, 26, 34, 0.85), rgba(19, 26, 34, 0.8)),
+    radial-gradient(600px 300px at 10% 0%, rgba(33, 230, 255, 0.06), rgba(0, 0, 0, 0)),
+    radial-gradient(600px 300px at 90% 0%, rgba(255, 63, 180, 0.05), rgba(0, 0, 0, 0));
+  backdrop-filter: saturate(120%) blur(2px);
+  border-left: 1px solid var(--border);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+/* Cards / generic containers (opt-in via .card class if used) */
+.card {
+  background: var(--surface-1);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  box-shadow: var(--elevation-1);
+}
+
+/* Ensure readable base sizes */
+html {
+  font-size: 16px;
+}
+body {
+  font-size: 16px;
+}

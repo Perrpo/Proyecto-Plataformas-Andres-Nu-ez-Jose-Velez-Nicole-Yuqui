@@ -1,0 +1,88 @@
+// Prisma schema for MySQL
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id           Int         @id @default(autoincrement())
+  email        String      @unique
+  passwordHash String
+  profile      UserProfile?
+  products     Product[]
+  notifications Notification[]
+  points       Int         @default(0)
+  level        Int         @default(1)
+  pointsHistory PointHistory[]
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+}
+
+model UserProfile {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  name      String
+  business  String?
+  phone     String?
+  address   String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Product {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nombre      String
+  categoria   String
+  unidades    Int
+  vencimiento DateTime
+  estado      String   @default("Disponible") // Disponible, Donado, Descuento, Vendido
+  precio      Float?
+  descuento   Float?   @default(0)
+  imagen      String?  // URL de la imagen del producto
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Location {
+  id             Int       @id @default(autoincrement())
+  nombre         String
+  tipo           String
+  direccion      String
+  especialidades Json      @default("[]")
+  lat            Float?
+  lng            Float?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      String   // "expiration", "donation", "inventory", "partner"
+  title     String
+  message   String
+  isRead    Boolean  @default(false)
+  urgent    Boolean  @default(false)
+  productId Int?
+  createdAt DateTime @default(now())
+}
+
+model PointHistory {
+  id          Int      @id @default(autoincrement())
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  points      Int      // Puntos ganados o perdidos (puede ser negativo)
+  action      String   // donation, product_added, level_up, etc.
+  description String   // Descripción de la acción
+  productId   Int?     // ID del producto relacionado (opcional)
+  createdAt   DateTime @default(now())
+}
